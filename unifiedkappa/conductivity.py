@@ -197,9 +197,11 @@ class class_kappa:
                 histo_kappa_d=histo_kappa_d*unit_factor
                 histo_kappa_od=histo_kappa_od*unit_factor
                 np.savetxt('array_od_xx.txt', histo_kappa_od[:,:,0,0])
-                np.savetxt('array_d_xx.txt', histo_kappa_d[:,:,0,0])
+                #np.savetxt('array_d_xx.txt', histo_kappa_d[:,:,0,0])
                 np.savetxt('array_od_yy.txt', histo_kappa_od[:,:,1,1])
                 np.savetxt('array_od_zz.txt', histo_kappa_od[:,:,2,2])
+                histo_kappa_od_ave = (histo_kappa_od[:,:,0,0] + histo_kappa_od[:,:,1,1] + histo_kappa_od[:,:,2,2]) / 3.0
+                np.savetxt('array_od_ave.txt', histo_kappa_od_ave)
                 # convert unit
                 kappaD  = np.zeros((3,3), dtype=np.complex128, order='C')
                 kappaOD = np.zeros((3,3), dtype=np.complex128, order='C')
@@ -218,16 +220,36 @@ class class_kappa:
                     f.write("   ".join(map(str, np.round(kappaOD.real.reshape((9,1)).flatten(),decimals=8) ))+"\n")
                     f.write("   ".join(map(str, np.round(kappaF.real.reshape((9,1)).flatten(),decimals=8) ))+"\n")
                     f.close()
-                if True:
-                    print ("Diagonal part of thermal conductivity: ")
-                    print (kappaD.real[0,0])
-                    print (kappaD.real)
-                    print ("Off-diagonal part of thermal conductivity: ")
-                    print (kappaOD.real[0,0])
-                    print (kappaOD.real)
-                    print ("Full thermal conductivity: ")
-                    print (kappaF.real[0,0])
-                    print (kappaF.real)
+                
+                flat_D  = kappaD.real.flatten()
+                flat_OD = kappaOD.real.flatten()
+                flat_F  = kappaF.real.flatten()
+                
+                ave_D  = (flat_D[0] + flat_D[4] + flat_D[8]) / 3.0
+                ave_OD = (flat_OD[0] + flat_OD[4] + flat_OD[8]) / 3.0
+                ave_F  = (flat_F[0] + flat_F[4] + flat_F[8]) / 3.0
+                
+                line_D  = np.array([temp] + list(flat_D)  + [ave_D])
+                line_OD = np.array([temp] + list(flat_OD) + [ave_OD])
+                line_F  = np.array([temp] + list(flat_F)  + [ave_F])
+                
+                fmt_str = "%d" + "   %.8e" * 10 
+                
+                with open("kl_d.txt", "a") as f_d:
+                    if f_d.tell() == 0:
+                        f_d.write("# Temp   xx   xy   xz   yx   yy   yz   zx   zy   zz   ave\n")
+                    np.savetxt(f_d, [line_D], fmt=fmt_str)
+                    
+                with open("kl_od.txt", "a") as f_od:
+                    if f_od.tell() == 0:
+                        f_od.write("# Temp   xx   xy   xz   yx   yy   yz   zx   zy   zz   ave\n")
+                    np.savetxt(f_od, [line_OD], fmt=fmt_str)
+                    
+                with open("kl_d_od.txt", "a") as f_f:
+                    if f_f.tell() == 0:
+                        f_f.write("# Temp   xx   xy   xz   yx   yy   yz   zx   zy   zz   ave\n")
+                    np.savetxt(f_f, [line_F], fmt=fmt_str)
+                    
         # return kappa
         #return [kappaD.real[0,0], kappaOD.real[0,0]]
         return [kappaD.real, kappaOD.real]
@@ -472,13 +494,35 @@ class class_kappa:
                 f.write("   ".join(map(str, np.round(kappaF.real.reshape((9,1)).flatten(),decimals=8) ))+"\n")
                 f.close()
                 os.system("touch minikappa")   
-                if True:
-                    print ("Diagonal part of thermal conductivity: ")
-                    print (kappaD.real)
-                    print ("Off-diagonal part of thermal conductivity: ")
-                    print (kappaOD.real)
-                    print ("Full thermal conductivity: ")
-                    print (kappaF.real)
+                
+                flat_D  = kappaD.real.flatten()
+                flat_OD = kappaOD.real.flatten()
+                flat_F  = kappaF.real.flatten()
+                
+                ave_D  = (flat_D[0] + flat_D[4] + flat_D[8]) / 3.0
+                ave_OD = (flat_OD[0] + flat_OD[4] + flat_OD[8]) / 3.0
+                ave_F  = (flat_F[0] + flat_F[4] + flat_F[8]) / 3.0
+                
+                line_D  = np.array([temp] + list(flat_D)  + [ave_D])
+                line_OD = np.array([temp] + list(flat_OD) + [ave_OD])
+                line_F  = np.array([temp] + list(flat_F)  + [ave_F])
+                
+                fmt_str = "%d" + "   %.8e" * 10 
+                
+                with open("kl_d.txt", "a") as f_d:
+                    if f_d.tell() == 0:
+                        f_d.write("# Temp   xx   xy   xz   yx   yy   yz   zx   zy   zz   ave\n")
+                    np.savetxt(f_d, [line_D], fmt=fmt_str)
+                    
+                with open("kl_od.txt", "a") as f_od:
+                    if f_od.tell() == 0:
+                        f_od.write("# Temp   xx   xy   xz   yx   yy   yz   zx   zy   zz   ave\n")
+                    np.savetxt(f_od, [line_OD], fmt=fmt_str)
+                    
+                with open("kl_d_od.txt", "a") as f_f:
+                    if f_f.tell() == 0:
+                        f_f.write("# Temp   xx   xy   xz   yx   yy   yz   zx   zy   zz   ave\n")
+                    np.savetxt(f_f, [line_F], fmt=fmt_str)
 
         
                 
