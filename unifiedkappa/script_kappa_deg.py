@@ -57,7 +57,7 @@ def read_dim_from_control(filename="CONTROL", default_dim=[2, 2, 2]):
 
 # 1. Read the mesh parameters from the CONTROL file
 mesh_config = read_mesh_from_control("CONTROL")
-dim_config = read_dim _from_control("CONTROL")
+dim_config = read_dim_from_control("CONTROL")
 
 # 2. Initialize the crystal structure and thermal conductivity objects
 obj_poscar = class_poscar("../POSCAR")
