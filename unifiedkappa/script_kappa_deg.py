@@ -30,8 +30,34 @@ def read_mesh_from_control(filename="CONTROL", default_mesh=[8, 8, 8]):
         return default_mesh
 
 
+def read_dim_from_control(filename="CONTROL", default_dim=[2, 2, 2]):
+    """
+    Parses the CONTROL file to extract the dim dimensions.
+    Returns a list of 3 integers, or the default mesh if not found.
+    """
+    try:
+        with open(filename, "r") as f:
+            content = f.read()
+            
+            # Regex details: Matches 'ngrid(:) = X Y Z' or 'ngrid = X Y Z' with flexible spacing
+            match = re.search(r"scell(?:\(:\))?\s*=\s*([-\d]+)\s+([-\d]+)\s+([-\d]+)", content)
+            
+            if match:
+                dim = [int(x) for x in match.groups()]
+                print(f"Successfully loaded dim_in from {filename}: {dim}")
+                return dim
+            else:
+                print(f"Warning: 'dim' settings not found in {filename}. Using default: {default_dim}")
+                return default_dim
+                
+    except FileNotFoundError:
+        print(f"Warning: {filename} file not found. Using default: {default_dim}")
+        return default_dim
+
+
 # 1. Read the mesh parameters from the CONTROL file
 mesh_config = read_mesh_from_control("CONTROL")
+dim_config = read_dim _from_control("CONTROL")
 
 # 2. Initialize the crystal structure and thermal conductivity objects
 obj_poscar = class_poscar("../POSCAR")
@@ -40,7 +66,7 @@ obj_kappa = class_kappa(obj_poscar)
 # 3. Calculate phonon thermal conductivity
 obj_kappa.get_kappa_phonopy(
     mesh_in = mesh_config,  # Dynamic grid loaded from the CONTROL file
-    sc_mat = np.eye(3) * 2,
+    sc_mat = dim_config,
     pm_mat = np.eye(3),
     list_temp = [300],
     name_pcell = "../POSCAR",
