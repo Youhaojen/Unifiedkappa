@@ -48,7 +48,7 @@ class class_poscar:
         self.spe_all = []
         for i in range(len(self.spe)):
             self.spe_all += [self.spe[i]]*self.cspe[i]
-        from atominfo import class_atom
+        from unifiedkappa.atominfo import class_atom
         self.mass = [ class_atom.amass[el] for el in self.spe_all]
         self.natom = sum(self.cspe)
         self.cord = self.input[7][0].upper()

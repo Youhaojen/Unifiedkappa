@@ -1,9 +1,14 @@
 import sys
 import re
 import numpy as np
-from crystal import class_poscar
-from conductivity import class_kappa
+from unifiedkappa.crystal import class_poscar
+from unifiedkappa.conductivity import class_kappa
 
+if len(sys.argv) != 2:
+    print("Usage: python script_kappa_deg.py temperature")
+    sys.exit(1)
+
+temp = int(sys.argv[1])
 
 def read_mesh_from_control(filename="CONTROL", default_mesh=[8, 8, 8]):
     """
@@ -60,7 +65,7 @@ mesh_config = read_mesh_from_control("CONTROL")
 dim_config = read_dim_from_control("CONTROL")
 
 # 2. Initialize the crystal structure and thermal conductivity objects
-obj_poscar = class_poscar("../POSCAR")
+obj_poscar = class_poscar("POSCAR")
 obj_kappa = class_kappa(obj_poscar)
 
 # 3. Calculate phonon thermal conductivity
@@ -68,13 +73,13 @@ obj_kappa.get_kappa_phonopy(
     mesh_in = mesh_config,  # Dynamic grid loaded from the CONTROL file
     sc_mat = dim_config,
     pm_mat = np.eye(3),
-    list_temp = [300],
-    name_pcell = "../POSCAR",
-    name_ifc2nd = "../FORCE_CONSTANTS_2ND",
+    list_temp = [temp],
+    name_pcell = "POSCAR",
+    name_ifc2nd = "FORCE_CONSTANTS_2ND",
     is_minikappa = False,
     is_planckian = False,
     is_sbtetau = True,
     path_sbtetau = "./",
     list_taufactor = [2.0],
-    delta_freq = 1
+    delta_freq = 0.2
 )

@@ -139,7 +139,7 @@ class class_kappa:
                                     #1/(6.582119*10^(-16)/(tmpp1*8.61733*10^-5))/10^12
                                     gamma_mode[iq,i] = 0.13092 * temp
                 if is_sbtetau:
-                    from sbte_io import class_shengbte
+                    from unifiedkappa.sbte_io import class_shengbte
                     obj_sbte = class_shengbte(path_dir = path_sbtetau,
                                               is_kappa = False,
                                               is_phase = False,
