@@ -58,7 +58,8 @@ def main():
         help="Target temperature (in K) for thermal conductivity calculation."
     )
     args = parser.parse_args()
-    temp = args.temperature
+    
+    temp = int(args.temperature)
 
     # 1. Read the mesh parameters from the CONTROL file
     mesh_config = read_mesh_from_control("CONTROL")
