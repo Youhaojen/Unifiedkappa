@@ -202,6 +202,58 @@ class class_kappa:
                 np.savetxt('array_od_zz.txt', histo_kappa_od[:,:,2,2])
                 histo_kappa_od_ave = (histo_kappa_od[:,:,0,0] + histo_kappa_od[:,:,1,1] + histo_kappa_od[:,:,2,2]) / 3.0
                 np.savetxt('array_od_ave.txt', histo_kappa_od_ave)
+
+                # mode kappa
+                kappa_P_qs = kappa_P_qs * unit_factor
+                kappa_C_qs = kappa_C_qs * unit_factor
+     
+                freqs_THz = freqs / (2 * pi)
+                q_idx_col = np.repeat(np.arange(nqpt), nband)
+                band_idx_col = np.tile(np.arange(nband), nqpt)
+     
+                comp_labels = ['xx', 'yy', 'zz']
+                for comp, label in enumerate(comp_labels):
+                    kP_c = kappa_P_qs[:, :, comp]
+                    kC_c = kappa_C_qs[:, :, comp]
+                    denom_arr = kP_c + kC_c
+                    ratio_c = np.divide(
+                        kP_c - kC_c, denom_arr,
+                        out=np.full_like(kP_c, np.nan),
+                        where=denom_arr != 0,
+                    )
+     
+                    mode_table = np.column_stack([
+                        q_idx_col, band_idx_col,
+                        freqs_THz.flatten(), gamma_mode.flatten(),
+                        kP_c.flatten(), kC_c.flatten(),
+                        ratio_c.flatten(),
+                    ])
+                    np.savetxt(
+                        f"mode_kappa_qs_T{int(temp)}-{label}.txt", mode_table,
+                        header=f"q_index band_index freq_THz gamma_ps-1 kappa_P_{label} kappa_C_{label} ratio_PC",
+                        fmt="%d %d %.6f %.6e %.6e %.6e %.6f",
+                    )
+     
+                kP_ave = (kappa_P_qs[:, :, 0] + kappa_P_qs[:, :, 1] + kappa_P_qs[:, :, 2]) / 3.0
+                kC_ave = (kappa_C_qs[:, :, 0] + kappa_C_qs[:, :, 1] + kappa_C_qs[:, :, 2]) / 3.0
+                denom_ave = kP_ave + kC_ave
+                ratio_ave = np.divide(
+                    kP_ave - kC_ave, denom_ave,
+                    out=np.full_like(kP_ave, np.nan),
+                    where=denom_ave != 0,
+                )
+                mode_table_ave = np.column_stack([
+                    q_idx_col, band_idx_col,
+                    freqs_THz.flatten(), gamma_mode.flatten(),
+                    kP_ave.flatten(), kC_ave.flatten(),
+                    ratio_ave.flatten(),
+                ])
+                np.savetxt(
+                    f"mode_kappa_qs_T{int(temp)}-ave.txt", mode_table_ave,
+                    header="q_index band_index freq_THz gamma_ps-1 kappa_P_ave kappa_C_ave ratio_PC",
+                    fmt="%d %d %.6f %.6e %.6e %.6e %.6f",
+                )
+                
                 # convert unit
                 kappaD  = np.zeros((3,3), dtype=np.complex128, order='C')
                 kappaOD = np.zeros((3,3), dtype=np.complex128, order='C')
